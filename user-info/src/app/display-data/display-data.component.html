@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<!-- 
+	Display Data Page
+	displays: table of user data that can be filtered by sex
+			  lowest, highest and avg age of user data or filtered data
+			  updated list after editing or removing user
+-->
+<html lang="en">
+<head>
+  <title>SES Assignment User Form</title>
+</head>
+<body>
+<form #tableForm="ngForm">
+  
+  <div class ="form-group">
+    <button type = "button" class = "btn btn-primary" [routerLink] = "['']">Home</button>
+    <h2> Display User Data </h2>
+	<div class = "form-group">
+	  <label for ="sex"> Filter by sex: </label>
+	    <select [(ngModel)]="filter" (change)="onChange()" name="sex" id ="sex" >
+	      <option value ="male">Male</option>
+		  <option value ="female">Female</option>
+		  <option value ="other">Other</option>
+	    </select>
+	  <button type="button" id="filterButton" class ="btn" [disabled]="isEditable" (click)="filterUser()" >Filter</button>
+	  <button type="button" id="clearFilterBtn" class ="btn" [disabled]="!isFilterable || isEditable" (click)="clearFilter()" >Clear</button>
+	</div>
+		<div class = "table-editable" id = "table">
+			<table class="table">
+				<colgroup>
+					<col width = "10%">
+					<col width = "*">
+					<col width = "20%">
+					<col width = "10%">
+					<col width = "15%">
+					<col width = "15%">
+					<col width = "15%">
+				</colgroup>
+				<thead>
+					<tr>
+						<th class = "text-center" scope = "col">#</th>
+						<th class = "text-center" scope = "col">First Name</th>
+						<th class = "text-center" scope = "col">Last Name</th>
+						<th class = "text-center" scope = "col">Sex</th>
+						<th class = "text-center" scope = "col">Birthday</th>
+						<th class = "text-center" scope = "col">Action</th>
+						<th class = "text-center" scope = "col">Remove</th>
+					</tr>
+				</thead>
+			<tbody>
+				<!-- only display filtered data if filter button was clicked -->
+				<ng-container *ngIf="isFilterable; else unFilteredRow">
+			    <tr *ngFor="let user of displayUsers; let i = index" >
+                    <th scope ="row">{{ i + 1 }}</th>
+                    <td> 
+                        <!-- if user is not being edited then display the data; otherwise go to fnameInput to edit the name -->
+                        <ng-container *ngIf="!editCache[user.id].edit; else fnameInput">
+                            {{ user.firstName }} 
+                        </ng-container>
+                        <ng-template #fnameInput>
+                            <input type="text" name="firstName" [(ngModel)]="editCache[user.id].data.firstName" #displayFirst="ngModel" 				
+                                required minlength="3" pattern="^[a-zA-Z]+$">
+                            <div *ngIf="displayFirst.errors?.required">First name is required.</div>
+                            <div *ngIf="displayFirst.errors?.minlength">First name should be minimum of {{ displayFirst.errors?.minlength.requiredLength }} characters. </div>
+                            <div *ngIf="displayFirst.errors?.pattern">First name should be comprised of only letters.</div>
+                        </ng-template>
+                    </td>
+				 
+                    <td> 
+                        <ng-container *ngIf="!editCache[user.id].edit; else lnameInput">
+                            {{ user.lastName }}
+                        </ng-container>
+                        <ng-template #lnameInput>
+                            <input type="text" name="lastName" [(ngModel)]="editCache[user.id].data.lastName" #displayLast="ngModel" 
+                                required minlength="3" pattern="^[a-zA-Z]+$">
+                            <div *ngIf="displayLast.errors?.required">Last name is required.</div>
+                            <div *ngIf="displayLast.errors?.minlength">Last name should be minimum of {{ displayLast.errors?.minlength.requiredLength }} characters. </div>
+                            <div *ngIf="displayLast.errors?.pattern">Last name should be comprised of only letters.</div>
+                        </ng-template>
+                    </td>
+				    <td> 
+					  <ng-container *ngIf="!editCache[user.id].edit; else sexInput">
+					    {{ user.sex }}
+					  </ng-container>
+					  <ng-template #sexInput>
+					    <input type="text" name="sex" [(ngModel)]="editCache[user.id].data.sex" #displaySex="ngModel"
+					     required pattern="^([mM][aA][lL][eE]|[fF][eE][mM][aA][lL][eE]|[oO][tT][hH][eE][rR])$">
+					    <div *ngIf="displaySex.errors?.required">User sex is required.</div>
+					    <div *ngIf="displaySex.errors?.pattern">User sex should be one of the following: male, female, other.</div> 
+					  </ng-template>
+				    </td>
+                    <td> 
+                      <ng-container *ngIf="!editCache[user.id].edit; else bdayInput">
+                        {{ user.birthday | date }}
+                      </ng-container>
+                      <ng-template #bdayInput>
+                        <input type="date" name="birthday" [ngModel]="birthday" (ngModelChange)="editCache[user.id].data.birthday = $event">
+                      </ng-template>
+                    </td>
+                    <td>
+                       <div class ="editable-row-operations">
+                         <ng-container *ngIf="!editCache[user.id].edit; else saveRow">
+                           <a (click)="startEdit(user.id)">Edit</a>
+                         </ng-container>
+                         <ng-template #saveRow>                           
+                            <!-- check if form is valid; if it's not then show alert when save is clicked -->
+                            <ng-container *ngIf="tableForm.form.valid; else alertSave">
+                              <a (click)="saveEdit(user.id)">Save</a>
+                            </ng-container>
+                            <ng-template #alertSave>
+                              <a (click)="saveAlert()">Save</a>
+                            </ng-template>
+                            <a (click)="cancelEdit(user.id)">Cancel</a>
+                         </ng-template>
+                       </div>
+                    </td>
+                      <td class="remove-user">
+                        <a (click)="removeUser(user.id)">Remove</a>
+                      </td>
+                    </tr>
+                
+                <!-- this will display the user data when there is no filter -->
+                </ng-container>	
+                <ng-template #unFilteredRow>
+                    <tr *ngFor="let user of displayForm.users; let i = index" >
+                      <th scope ="row">{{ i + 1 }}</th>
+                      <td> 
+                        <ng-container *ngIf="!editCache[user.id].edit; else fnameInput">
+                          {{ user.firstName }}
+                        </ng-container>
+                        <ng-template #fnameInput>
+                          <input type="text" name="firstName" class="form-control" [(ngModel)]="editCache[user.id].data.firstName" #displayFirst="ngModel" 
+                            required minlength="3" pattern="^[a-zA-Z]+$">
+                          <div *ngIf="displayFirst.errors?.required">First name is required.</div>
+                          <div *ngIf="displayFirst.errors?.minlength">First name should be minimum of {{ displayFirst.errors?.minlength.requiredLength }} characters. </div>
+                          <div *ngIf="displayFirst.errors?.pattern">First name should be comprised of only letters.</div>
+                        </ng-template>
+                      </td>                      
+                      <td> 
+                        <ng-container *ngIf="!editCache[user.id].edit; else lnameInput">
+                          {{ user.lastName }}
+                        </ng-container>
+                        <ng-template #lnameInput>
+                          <input type="text" name="lastName" [(ngModel)]="editCache[user.id].data.lastName"#displayLast="ngModel" 
+                            required minlength="3" pattern="^[a-zA-Z]+$">
+                          <div *ngIf="displayLast.errors?.required">Last name is required.</div>
+                          <div *ngIf="displayLast.errors?.minlength">Last name should be minimum of {{ displayLast.errors?.minlength.requiredLength }} characters. </div>
+                          <div *ngIf="displayLast.errors?.pattern">Last name should be comprised of only letters.</div>
+                        </ng-template>
+                      </td>                                        
+                      <td> 
+                        <ng-container *ngIf="!editCache[user.id].edit; else sexInput">
+                          {{ user.sex }}
+                        </ng-container>
+                        <ng-template #sexInput>
+                          <input type="text" name="sex" [(ngModel)]="editCache[user.id].data.sex" #displaySex="ngModel"
+                           required pattern="^([mM][aA][lL][eE]|[fF][eE][mM][aA][lL][eE]|[oO][tT][hH][eE][rR])$">
+                          <div *ngIf="displaySex.errors?.required">User sex is required.</div>
+                          <div *ngIf="displaySex.errors?.pattern">User sex should be one of the following: male, female, other.</div> 
+                        </ng-template>
+                      </td>                      
+                      <td> 
+                        <ng-container *ngIf="!editCache[user.id].edit; else bdayInput">
+                          {{ user.birthday | date }}
+                        </ng-container>
+                        <ng-template #bdayInput>
+                          <input type="date" name="birthday" [ngModel]="birthday" (ngModelChange)="editCache[user.id].data.birthday = $event">
+                        </ng-template>
+                      </td>
+                      <td>
+                        <div class ="editable-row-operations">
+                          <ng-container *ngIf="!editCache[user.id].edit; else saveRow">
+                            <a [routerLink]="" (click)="startEdit(user.id)">Edit</a>
+                          </ng-container>
+                          <ng-template #saveRow>
+                            <ng-container *ngIf="tableForm.form.valid; else alertSave">
+                              <a (click)="saveEdit(user.id)">Save</a>
+                            </ng-container>
+                            <ng-template #alertSave>
+                             <a (click)="saveAlert()">Save</a>
+                            </ng-template>
+                            
+                            <a (click)="cancelEdit(user.id)">Cancel</a>
+                          </ng-template>
+                        </div>
+                      </td>	
+                      <td class="remove-user">
+                        <a  (click)="removeUser(user.id)">Remove</a>
+                      </td>
+                    </tr>
+                </ng-template>
+            </tbody>
+        </table>
+		</div>
+		<div class = "user-age">
+			<h2> User Age Data</h2>
+			<ng-container *ngIf="isFilterable; else unFilteredAge">
+			<!-- lowest, highest, avg of user age    -->
+			<ul>
+			  <li> Lowest User Age: {{this.ageMin}} </li>
+			  <li> Highest User Age: {{this.ageMax}}</li>
+			  <li> Average User Age: {{this.ageAvg}}</li>
+			</ul>
+			</ng-container>
+			<ng-template #unFilteredAge>
+			<!-- lowest, highest, avg of user age    -->
+			<ul>
+			  <li> Lowest User Age: {{this.ageMin}} </li>
+			  <li> Highest User Age: {{this.ageMax}}</li>
+			  <li> Average User Age: {{this.ageAvg}}</li>
+			</ul>
+			</ng-template>
+		</div>
+    </div>
+	</form>
+</body>
+</html>

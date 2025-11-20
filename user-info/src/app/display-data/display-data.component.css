@@ -1,0 +1,68 @@
+ form {
+  /* Center the form on the page */
+  margin: 0 auto;
+  width: 500px;
+  /* Form outline */
+  padding: 2em;
+  border: 1px solid #CCC;
+  border-radius: 1em;
+}
+ 
+ h2 {
+	 /* Center h2 tag text */
+	text-align: center;
+	 
+ }
+ 
+ .editable-row-operations a {
+	/* Make the edit, save, cancel a tags look like they are clickable */
+    margin-right: 8px;
+	cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+
+table,
+td {
+	/* Give a border to each table row and the whole table */
+    border: 1px solid #333;
+}
+
+
+
+td,
+th {
+	/* Align the text of the table header and rows */
+	text-align: left;
+    padding: 15px;
+}
+
+td > input {
+	/* Make the input fields for editing fit the contents of the row */
+	width:100%;
+	
+}
+
+.remove-user a {
+	/* Make the a tag for removing a user look clickable */
+	margin-right: 8px;
+	cursor:pointer;
+    color:blue;
+    text-decoration:underline;
+}
+
+.user-age {
+	/* give a border to the user age data section */
+	border: 1px solid #333;
+}
+
+.user-age ul{
+	/* Make the bullet points closer to the list contents */
+	list-style-position: inside;
+}
+
+.user-age li{
+	/* make the list of data  centered */
+	text-align: center;
+}

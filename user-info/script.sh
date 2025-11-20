@@ -1,0 +1,17 @@
+npm install @angular/animations@~12.0.4
+ npm install @angular/common@~12.0.4
+ npm install @angular/core@~12.0.4
+ npm install @angular/forms@~12.0.4
+ npm install @angular/platform-browser@~12.0.4
+ npm install @angular/platform-browser-dynamic@~12.0.4
+ npm install @angular/router@~12.0.4
+ npm install tslib@^2.1.0
+ npm install zone.js@~0.11.4
+ npm install @types/jasmine@~3.6.0
+ npm install @types/node@^12.0.4
+ npm install jasmine-core@~3.7.0
+ npm install karma@~6.3.0
+ npm install karma-chrome-launcher@~3.1.0
+ npm install karma-coverage@~2.0.3
+ npm install karma-jasmine@~4.0.0
+ npm install karma-jasmine-html-reporter@^1.5.0

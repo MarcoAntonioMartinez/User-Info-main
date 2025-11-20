@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--  User Info Html
+	  Displays the form used to enter user data
+  -->
+  
+<html lang="en">
+<head>
+  <title>User Information Form</title>
+</head>
+<body>
+  <form #userForm = "ngForm" (ngSubmit)= "handleUserData(userForm)" >
+	<h2>User Form</h2>
+	<div class ="form-group">
+		<label for = "firstName"> First Name: </label>
+		<input [(ngModel)]="model.firstName" type = "text" id = "firstName" name = "firstName" #firstName ="ngModel" class ="form-control"
+			required minlength ="3" pattern="^[a-zA-Z]+$" >
+		<div [hidden]="firstName.valid || firstName.pristine" class = "alert" *ngIf="firstName.touched && !firstName.valid">
+			<div *ngIf="firstName.errors?.required">First name is required.</div>
+			<div *ngIf="firstName.errors?.minlength">First name should be minimum of {{ firstName.errors?.minlength.requiredLength }} characters. </div>
+			<div *ngIf="firstName.errors?.pattern">First name should be comprised of only letters.</div>
+		</div>
+	</div>
+	<div class = "form-group">
+		<label for = "lastName"> Last Name: </label>
+		<input [(ngModel)]="model.lastName" type = "text" id = "lastName" name = "lastName" #lastName = "ngModel" class ="form-control"
+			required minlength="3" pattern="^[a-zA-Z]+$">
+		<div [hidden]="lastName.valid || lastName.pristine" class = "alert" *ngIf="lastName.touched && !lastName.valid">
+			<div *ngIf="lastName.errors?.required">Last name is required.</div>
+			<div *ngIf="lastName.errors?.minlength">Last name should be minimum of {{ lastName.errors?.minlength.requiredLength }} characters. </div>
+			<div *ngIf="lastName.errors?.pattern">Last name should be comprised of only letters.</div>
+		</div>	  
+	</div>
+	<div class = "form-group">
+		<p>   What is your sex? </p> <br>
+		<input [(ngModel)]="model.sex" type = "radio" id = "male" name = "sex" class = "radio" value = "male" #sex = "ngModel" required>
+		<label for = "male" class="radio" > Male </label> <br>
+		<input [(ngModel)]="model.sex" type = "radio" id = "female" name = "sex" class = "radio" value = "female" #sex = "ngModel" required>
+		<label for = "female" class="radio"> Female </label> <br>
+		<input [(ngModel)]="model.sex" type = "radio" id = "other" name = "sex" class = "radio" value = "other" #sex = "ngModel" required>
+		<label for = "other" class="radio"> Other </label> <br>
+		<div class = "alert" *ngIf ="!sex.touched"> 
+			<div *ngIf= "sex.errors?.required">Please select a sex.</div>
+		</div>
+	</div>    
+	<div class = "form-group">	
+		<label for = "birthday">  Birthday: </label>
+		<input [ngModel]="today" (ngModelChange)="model.birthday = $event" name="birthday" type = "date" id = "birthday" class="form-control"
+		  #birthday = "ngModel" required>
+		<!-- shows error after adding first user and when no date has been selected -->
+	      <div *ngIf= "birthday.errors?.required">Please select a birthday.</div>
+	</div>
+	<div class ="form-group">
+        <button type = "button" class = "btn btn-primary" 
+            [disabled]= "!userForm.form.valid" (click)="addUser(); clearForm(userForm); isNotAdded=false" >Add user</button>
+	 <!-- if there is data that was not submitted, show confirmation dialog for when user submits without finishing input -->
+        <ng-container *ngIf="userForm.form.invalid && userForm.form.dirty; else normalSubmit">
+            <button type = "submit" class = "btn btn-primary" 
+                [disabled]= "!isSubmittable" (click)="isNotAdded=true">Submit</button>
+        </ng-container>
+	  <!-- otherwise submit works as normal -->
+        <ng-template #normalSubmit>
+            <button type = "submit" class = "btn btn-primary" 
+                [disabled]= "!isSubmittable">Submit</button>
+        </ng-template>
+        <button type = "button" class = "btn btn-primary" [routerLink] = "['../display-data']"
+            [disabled]= "!isDisplayable">Display data</button>  
+	</div>
+  </form> 
+</body>
+</html>
